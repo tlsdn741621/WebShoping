@@ -20,19 +20,20 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable()) // 개발 단계에서는 CSRF 비활성화 (운영에선 true)
+                .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/register", "/login", "/css/**", "/js/**", "/images/**").permitAll() // 로그인 없이 접근 허용
-                        .anyRequest().authenticated() // 그 외 모든 요청은 인증 필요
+                        .requestMatchers("/register", "/login", "/css/**", "/js/**").permitAll()
+                        .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
-                        .loginPage("/login") // 커스텀 로그인 페이지 경로 (없으면 기본 로그인 페이지 사용됨)
-                        .defaultSuccessUrl("/", true) // 로그인 성공 시 이동할 기본 경로
+                        .loginPage("/login")
+                        .defaultSuccessUrl("/", true)
+                        .failureUrl("/login?error=true")
                         .permitAll()
                 )
                 .logout(logout -> logout
                         .logoutUrl("/logout")
-                        .logoutSuccessUrl("/login?logout") // 로그아웃 성공 시 이동할 경로
+                        .logoutSuccessUrl("/login?logout")
                         .invalidateHttpSession(true)
                 );
 
