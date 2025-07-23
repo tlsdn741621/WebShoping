@@ -23,6 +23,12 @@ public class MemberController {
 
     @PostMapping("/register")
     public String register(@ModelAttribute MemberDTO memberDTO, Model model) {
+        // 아이디 중복 확인
+        if (memberService.isMemberIdDuplicated(memberDTO.getMemberId())) {
+            model.addAttribute("errorMessage", "이미 존재하는 아이디입니다.");
+            model.addAttribute("memberDTO", memberDTO);
+            return "board/register";
+        }
         // 비밀번호 확인 필드를 DTO에 추가했다고 가정 (없으면 아래처럼 따로 받을 수도 있음)
         if (!memberDTO.getPassword().equals(memberDTO.getConfirmPassword())) {
             model.addAttribute("errorMessage", "비밀번호가 일치하지 않습니다.");

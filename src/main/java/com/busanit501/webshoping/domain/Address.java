@@ -7,6 +7,8 @@ import jakarta.persistence.ManyToOne;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Getter
 @Setter
@@ -17,6 +19,7 @@ public class Address {
     private String zipcode;
     private String addressId;
     private String addressLine;
+    private LocalDateTime createdAt;
 
     private boolean isDefault; // 기본 배송지 여부
 
