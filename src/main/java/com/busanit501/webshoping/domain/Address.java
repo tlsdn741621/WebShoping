@@ -1,21 +1,18 @@
 package com.busanit501.webshoping.domain;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Getter
-@Setter
+@Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Table(name = "address")
 public class Address {
-    @Id @GeneratedValue
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String zipcode;
@@ -28,5 +25,6 @@ public class Address {
     // N(배송지) : 1(회원)
     // 하나의 회원에 여러개의 배송지를 입력할 수 있도록 만들겠습니다.
     @ManyToOne
+    @JoinColumn(name = "member_id")
     private Member member;
 }

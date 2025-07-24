@@ -2,9 +2,11 @@ package com.busanit501.webshoping.controller;
 
 import com.busanit501.webshoping.DTO.MemberDTO;
 import com.busanit501.webshoping.service.MemberService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,20 +24,27 @@ public class MemberController {
     }
 
     @PostMapping("/register")
-    public String register(@ModelAttribute MemberDTO memberDTO, Model model) {
+    public String register(@Valid @ModelAttribute MemberDTO memberDTO,
+                           BindingResult bindingResult,
+                           Model model) {
+        // 유효성 검사 실패
+        if (bindingResult.hasErrors()) {
+            return "board/register";
+        }
+
         // 아이디 중복 확인
         if (memberService.isMemberIdDuplicated(memberDTO.getMemberId())) {
             model.addAttribute("errorMessage", "이미 존재하는 아이디입니다.");
-            model.addAttribute("memberDTO", memberDTO);
             return "board/register";
         }
-        // 비밀번호 확인 필드를 DTO에 추가했다고 가정 (없으면 아래처럼 따로 받을 수도 있음)
+
+        // 비밀번호 확인
         if (!memberDTO.getPassword().equals(memberDTO.getConfirmPassword())) {
             model.addAttribute("errorMessage", "비밀번호가 일치하지 않습니다.");
-            model.addAttribute("memberDTO", memberDTO);
-            return "board/register"; // 다시 회원가입 폼으로 이동
+            return "board/register";
         }
 
+        // 회원 등록
         memberService.register(memberDTO);
         return "redirect:/login";
     }

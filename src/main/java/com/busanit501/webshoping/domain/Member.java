@@ -9,24 +9,30 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Getter
-@Setter
+@Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class Member {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String memberId;
     private String email;
     private String password;
+
+    @Column(name = "user_name")
     private String userName;
+
     private String phone;
     private LocalDate birthDate;
     private LocalDateTime createdAt;
 
+    @Column(nullable = false)
+    private String role;
+
+    @Builder.Default
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Address> addresses = new ArrayList<>();
 }

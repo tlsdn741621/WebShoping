@@ -3,12 +3,11 @@ package com.busanit501.webshoping.service;
 import com.busanit501.webshoping.DTO.MemberDTO;
 import com.busanit501.webshoping.domain.Address;
 import com.busanit501.webshoping.domain.Member;
+import com.busanit501.webshoping.mapper.MemberMapper;
 import com.busanit501.webshoping.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -19,35 +18,21 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     public void register(MemberDTO dto) {
-        // 비밀번호 암호화
+        // 비밀번호 인코딩
         String encodedPassword = passwordEncoder.encode(dto.getPassword());
 
-        // Member 엔티티 생성 (Builder 사용)
-        Member member = Member.builder()
-                .memberId(dto.getMemberId())
-                .email(dto.getEmail())
-                .password(encodedPassword)
-                .userName(dto.getUserName())
-                .phone(dto.getPhone())
-                .birthDate(dto.getBirthDate())
-                .createdAt(LocalDateTime.now())
-                .build();
+        // DTO → Member 변환
+        Member member = MemberMapper.toMemberEntity(dto, encodedPassword);
 
-        // 주소 정보가 있다면 Address 생성
+        // 기본 권한 세팅
+        member.setRole("ROLE_USER");
+
+        // 주소가 있다면 Address도 생성 후 관계 연결
         if (dto.isRegisterAddress()) {
-            Address address = Address.builder()
-                    .zipcode(dto.getZipcode())
-                    .addressId(dto.getAddressId())
-                    .addressLine(dto.getAddressLine())
-                    .createdAt(LocalDateTime.now())
-                    .isDefault(true)
-                    .member(member) // 연관 관계 설정
-                    .build();
-
-            member.getAddresses().add(address);
+            Address address = MemberMapper.toAddressEntity(dto, member);
+            member.getAddresses().add(address); // 양방향일 경우
         }
 
-        // member 저장 (address도 cascade 설정 되어 있어야 자동 저장됨)
         memberRepository.save(member);
     }
 
